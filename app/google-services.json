@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1022013291344",
+    "project_id": "mobileprogrammingaol",
+    "storage_bucket": "mobileprogrammingaol.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1022013291344:android:557984fb1b18acac89ca55",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBb2pbdeBp0HVmvhjMR-wb3G6qrRoLgLA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
