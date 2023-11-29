@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/primary"
-    tools:context=".Login">
+    tools:context=".forgotpassword.Email">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="30dp"
                 android:textStyle="bold"
-                android:text="Login"
+                android:text="Forgot Password"
                 android:textColor="@color/secondary"
                 android:layout_gravity="center"
                 />
@@ -55,74 +55,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="8dp"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:text="Password"
-                />
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:background="@drawable/shape"
-                android:padding="8dp"
-                android:id="@+id/etPassword"
-                />
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="8dp"/>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_alignParentLeft="true"
-                    >
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="No account?"
-                        />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" Register"
-                        android:textColor="@color/secondary"
-                        android:id="@+id/tvToRegister"
-                        />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:text="Forgot password?"
-                    android:textColor="@color/secondary"
-                    android:id="@+id/tvToForgotPassword"
-                    />
-            </RelativeLayout>
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="8dp"/>
-
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Login"
+                android:text="Send"
                 android:textColor="@color/secondary"
                 app:cornerRadius="10dp"
                 android:backgroundTint="@color/primary"
-                android:id="@+id/btnLogin"
+                android:id="@+id/btnSendEmail"
                 />
 
             <Space
