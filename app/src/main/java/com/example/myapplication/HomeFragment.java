@@ -3,8 +3,11 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,7 +65,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     // dari sini kebawah seharusnya mirip kaya activity
     FirebaseAuth mauth;
 
-    Button btnLogout;
+    Button btnLogout, test;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,8 +75,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
         mauth = FirebaseAuth.getInstance();
 
+        // toolbar
+        Toolbar myToolbar = getActivity().findViewById(R.id.myToolbar);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(myToolbar);
+
         btnLogout = (Button) view.findViewById(R.id.btnLogout);
+        test = view.findViewById(R.id.test);
+
         btnLogout.setOnClickListener(this);
+        test.setOnClickListener(this);
+
 
         // Inflate the layout for this fragment
         return view;

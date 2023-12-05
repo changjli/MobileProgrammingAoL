@@ -2,12 +2,17 @@ package com.example.myapplication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -18,6 +23,8 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth mAuth;
+
+    Toolbar myToolbar;
 
     FrameLayout flContainer;
 
@@ -31,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         // first page
-        injectFragment(new HomeFragment());
+        injectFragment(new HomeFragment(), "Home");
 
         flContainer = findViewById(R.id.flContainer);
         bottomNavigationBar = findViewById(R.id.bottomNavigationBar);
@@ -39,14 +46,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 Fragment fragment = null;
+                String tag = "";
                 if(item.getItemId() == R.id.toHome){
                     fragment = new HomeFragment();
+                    tag = "Home";
                 }else if(item.getItemId() == R.id.toCinema){
                     fragment = new CinemaFragment();
+                    tag = "Cinema";
                 }else if(item.getItemId() == R.id.toTicket){
                     fragment = new TicketFragment();
+                    tag = "Ticket";
                 }
-                return injectFragment(fragment);
+                return injectFragment(fragment, tag);
             }
         });
     }
@@ -61,13 +72,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean injectFragment(Fragment fragment) {
+    private boolean injectFragment(Fragment fragment, String tag) {
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.flContainer, fragment)
+                    .addToBackStack(tag)
                     .commit();
             return true;
         }
         return false;
+    }
+
+    // option menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.option_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection.
+       if(item.getItemId() == R.id.toProfile) {
+           Intent toProfile = new Intent(this, Profile.class);
+           startActivity(toProfile);
+       }
+       return super.onOptionsItemSelected(item);
     }
 }
