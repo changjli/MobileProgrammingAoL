@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -52,11 +53,13 @@ public class Profile extends AppCompatActivity implements View.OnClickListener, 
 
     EditText etEmail, etName, etAddress, etDob;
 
-    Button btnDatePicker, btnSave;
+    Button btnDatePicker, btnSave, btnLogout;
 
     DatePickerDialog datePicker;
 
     RadioButton genderMale, genderFemale, genderUnsure;
+
+    SimpleDateFormat df;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +88,7 @@ public class Profile extends AppCompatActivity implements View.OnClickListener, 
 
         btnDatePicker = findViewById(R.id.btnDatePicker);
         btnSave = findViewById(R.id.btnSave);
+        btnLogout = findViewById(R.id.btnLogout);
 
         genderMale = findViewById(R.id.genderMale);
         genderFemale = findViewById(R.id.genderFemale);
@@ -92,12 +96,13 @@ public class Profile extends AppCompatActivity implements View.OnClickListener, 
 
         btnDatePicker.setOnClickListener(this);
         btnSave.setOnClickListener(this);
+        btnLogout.setOnClickListener(this);
 
         genderMale.setOnCheckedChangeListener(this);
         genderFemale.setOnCheckedChangeListener(this);
         genderUnsure.setOnCheckedChangeListener(this);
 
-
+        df = new SimpleDateFormat("MM dd, yyyy");
     }
 
     @Override
@@ -119,9 +124,16 @@ public class Profile extends AppCompatActivity implements View.OnClickListener, 
 
                                         etName.setText(user.getName());
                                         etAddress.setText(user.getAddress());
+                                        etDob.setText(df.format(user.getDob()));
+                                        Log.d("gender", user.getGender());
+                                        if(user.getGender().equals("male")){
+                                            genderMale.setChecked(true);
+                                        }else if(user.getGender().equals("female")){
+                                            genderFemale.setChecked(true);
+                                        }else if(user.getGender().equals("unsure")){
+                                            genderUnsure.setChecked(true);
+                                        }
 
-                                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                                        etDob.setText(formatter.format(user.getDob()));
                                     }
                                 }else{
                                     user = new User();
@@ -147,10 +159,8 @@ public class Profile extends AppCompatActivity implements View.OnClickListener, 
             user.setEmail(muser.getEmail());
             user.setName(etName.getText().toString());
             user.setAddress(etAddress.getText().toString());
-
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
             try {
-                user.setDob(formatter.parse(etDob.getText().toString()));
+                user.setDob(df.parse(etDob.getText().toString()));
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
@@ -187,6 +197,10 @@ public class Profile extends AppCompatActivity implements View.OnClickListener, 
                             }
                         });
             }
+        }else if(v.getId() == R.id.btnLogout){
+            mauth.signOut();
+            Intent toLogin = new Intent(this, Login.class);
+            startActivity(toLogin);
         }
     }
 
@@ -212,8 +226,7 @@ public class Profile extends AppCompatActivity implements View.OnClickListener, 
                 Calendar selectedDate = Calendar.getInstance();
                 selectedDate.set(year, monthOfYear, dayOfMonth);
 
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                etDob.setText(formatter.format(selectedDate.getTime()));
+                etDob.setText(df.format(selectedDate.getTime()));
             }
 
         },initialDate.get(Calendar.YEAR), initialDate.get(Calendar.MONTH), initialDate.get(Calendar.DAY_OF_MONTH));

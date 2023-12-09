@@ -37,6 +37,11 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
+        // toolbar
+        myToolbar = findViewById(R.id.myToolbar);
+        setSupportActionBar(myToolbar);
+        myToolbar.setTitle("FlixTix");
+
         // first page
         injectFragment(new HomeFragment(), "Home");
 
@@ -74,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean injectFragment(Fragment fragment, String tag) {
         if (fragment != null) {
+            getSupportFragmentManager().popBackStack();
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.flContainer, fragment)
                     .addToBackStack(tag)

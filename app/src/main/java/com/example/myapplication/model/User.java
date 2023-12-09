@@ -39,7 +39,7 @@ public class User {
         this.name = document.getString("name");
         this.address = document.getString("address");
         this.gender = document.getString("gender");
-        this.dob = document.getDate("date");
+        this.dob = document.getDate("dob");
     }
 
     public String getUid() {
