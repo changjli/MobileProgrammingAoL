@@ -2,11 +2,27 @@ package com.example.myapplication;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.myapplication.model.Cinema;
+import com.example.myapplication.model.Movie;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,6 +62,12 @@ public class CinemaFragment extends Fragment {
         return fragment;
     }
 
+    ArrayList<Cinema> cinemas;
+
+    Toolbar myToolbar;
+
+    RecyclerView rvCinemas;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,5 +82,36 @@ public class CinemaFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_cinema, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        cinemas = new ArrayList<>();
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        CinemaAdapter cinemaAdapter = new CinemaAdapter(getContext(), cinemas);
+
+        rvCinemas = view.findViewById(R.id.rvCinemas);
+        rvCinemas.setAdapter(cinemaAdapter);
+        rvCinemas.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        db.collection("cinemas")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                cinemas.add(new Cinema(document));
+                            }
+                            cinemaAdapter.setCinemas(cinemas);
+                        } else {
+
+                        }
+                    }
+                });
     }
 }

@@ -31,10 +31,6 @@ public class CinemaActivity extends AppCompatActivity {
 
     RecyclerView rvCinemas;
 
-    public Movie getMovie() {
-        return movie;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

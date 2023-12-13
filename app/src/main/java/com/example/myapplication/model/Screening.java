@@ -6,18 +6,23 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.sql.Date;
-import java.sql.Time;
+import org.checkerframework.checker.units.qual.A;
+
+import java.util.ArrayList;
+import java.util.Date;
 
 public class Screening {
+    private DocumentReference ref;
     private String id;
     private Movie movie;
     private Cinema cinema;
     private Date date;
+    private ArrayList<ScreeningTime> time;
 
     public Screening(String id, Movie movie, Cinema cinema, Date date) {
         this.id = id;
@@ -27,8 +32,9 @@ public class Screening {
     }
 
     public Screening(QueryDocumentSnapshot document){
+        this.ref = document.getReference();
         this.id = document.getId();
-
+        time = new ArrayList<>();
     }
 
     public String getId() {
@@ -61,5 +67,25 @@ public class Screening {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public DocumentReference getRef() {
+        return ref;
+    }
+
+    public void setRef(DocumentReference ref) {
+        this.ref = ref;
+    }
+
+    public ArrayList<ScreeningTime> getTime() {
+        return time;
+    }
+
+    public void setTime(ArrayList<ScreeningTime> time) {
+        this.time = time;
+    }
+
+    public void addTime(QueryDocumentSnapshot document){
+        this.time.add(new ScreeningTime(document));
     }
 }

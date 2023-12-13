@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,6 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
 
     Context context;
     ArrayList<Cinema> cinemas;
-
     Movie movie;
 
     public CinemaAdapter(Context context, ArrayList<Cinema> cinemas){
@@ -58,7 +58,9 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
             @Override
             public void onClick(View v) {
                 Intent toScreening = new Intent(context, ScreeningActivity.class);
-                toScreening.putExtra("movie", movie);
+                if(movie != null){
+                    toScreening.putExtra("movie", movie);
+                }
                 toScreening.putExtra("cinema", cinemas.get(holder.getAdapterPosition()));
                 context.startActivity(toScreening);
             }
@@ -79,7 +81,6 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
             // Define click listener for the ViewHolder's View
 
             tvCinemaLocation = view.findViewById(R.id.tvCinemaLocation);
-
         }
     }
 }
