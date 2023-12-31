@@ -6,7 +6,6 @@ import java.util.Date;
 
 public class User {
     private String id;
-
     private String uid;
     private String phoneNumber;
     private String email;
@@ -15,6 +14,8 @@ public class User {
     private String address;
     private String gender;
     private Date dob;
+
+    private String profileImage;
 
     // default constructor
     public User() {
@@ -27,6 +28,7 @@ public class User {
         this.address = null;
         this.gender = null;
         this.dob = null;
+        this.profileImage = null;
     }
 
     // constructor when converting document to object
@@ -40,6 +42,7 @@ public class User {
         this.address = document.getString("address");
         this.gender = document.getString("gender");
         this.dob = document.getDate("dob");
+        this.profileImage = document.getString("profileImage");
     }
 
     public String getUid() {
@@ -112,5 +115,13 @@ public class User {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 }

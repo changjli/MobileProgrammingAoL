@@ -20,12 +20,7 @@ import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class MainActivity extends AppCompatActivity {
-
-    FirebaseAuth mAuth;
-
-    Toolbar myToolbar;
-
+public class MainActivity extends TemplateActivity {
     FrameLayout flContainer;
 
     NavigationBarView bottomNavigationBar;
@@ -35,30 +30,31 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mAuth = FirebaseAuth.getInstance();
-
-        // toolbar
-        myToolbar = findViewById(R.id.myToolbar);
-        setSupportActionBar(myToolbar);
-        myToolbar.setTitle("FlixTix");
+        super.setupToolbar("FlixTix");
 
         // first page
         injectFragment(new HomeFragment(), "Home");
 
         flContainer = findViewById(R.id.flContainer);
         bottomNavigationBar = findViewById(R.id.bottomNavigationBar);
+
         bottomNavigationBar.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 Fragment fragment = null;
                 String tag = "";
-                if(item.getItemId() == R.id.toHome){
+                if(item.getItemId() == R.id.menuItemHome){
                     fragment = new HomeFragment();
                     tag = "Home";
-                }else if(item.getItemId() == R.id.toCinema){
+                }else if(item.getItemId() == R.id.menuItemCinema){
                     fragment = new CinemaFragment();
                     tag = "Cinema";
-                }else if(item.getItemId() == R.id.toTicket){
+                }
+//                else if(item.getItemId() == R.id.menuItemFood){
+//                    fragment = new FoodFragment();
+//                    tag = "Food";
+//                }
+                else if(item.getItemId() == R.id.menuItemTicket){
                     fragment = new TicketFragment();
                     tag = "Ticket";
                 }
@@ -67,10 +63,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // kalo belom login
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        FirebaseUser currentUser = super.mauth.getCurrentUser();
         if(currentUser == null){
             Intent toLogin = new Intent(this, Login.class);
             startActivity(toLogin);
@@ -87,23 +84,5 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return false;
-    }
-
-    // option menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.option_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection.
-       if(item.getItemId() == R.id.toProfile) {
-           Intent toProfile = new Intent(this, Profile.class);
-           startActivity(toProfile);
-       }
-       return super.onOptionsItemSelected(item);
     }
 }

@@ -2,10 +2,12 @@ package com.example.myapplication.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 
@@ -14,20 +16,20 @@ public class Seat implements Parcelable {
     String ref;
     String id;
     String seatNumber;
-    Boolean isAvailable;
+    Boolean availability;
 
-    public Seat(String ref, String id, String seatNumber, Boolean isAvailable) {
+    public Seat(String ref, String id, String seatNumber, Boolean availability) {
         this.ref = ref;
         this.id = id;
         this.seatNumber = seatNumber;
-        this.isAvailable = isAvailable;
+        this.availability = availability;
     }
 
     public Seat(DocumentSnapshot doc){
         this.ref = doc.getReference().getPath();
         this.id = doc.getId();
         this.seatNumber = doc.getString("seatNumber");
-        this.isAvailable = doc.getBoolean("availability");
+        this.availability = doc.getBoolean("availability");
     }
 
     protected Seat(Parcel in) {
@@ -35,7 +37,7 @@ public class Seat implements Parcelable {
         id = in.readString();
         seatNumber = in.readString();
         byte tmpIsAvailable = in.readByte();
-        isAvailable = tmpIsAvailable == 0 ? null : tmpIsAvailable == 1;
+        availability = tmpIsAvailable == 0 ? null : tmpIsAvailable == 1;
     }
 
     public String getRef() {
@@ -62,12 +64,12 @@ public class Seat implements Parcelable {
         this.seatNumber = seatNumber;
     }
 
-    public Boolean getAvailable() {
-        return isAvailable;
+    public Boolean getAvailability() {
+        return availability;
     }
 
-    public void setAvailable(Boolean available) {
-        isAvailable = available;
+    public void setAvailability(Boolean available) {
+        availability = available;
     }
 
     public static final Creator<Seat> CREATOR = new Creator<Seat>() {
@@ -109,6 +111,6 @@ public class Seat implements Parcelable {
         dest.writeString(ref);
         dest.writeString(id);
         dest.writeString(seatNumber);
-        dest.writeByte((byte) (isAvailable == null ? 0 : isAvailable ? 1 : 2));
+        dest.writeByte((byte) (availability == null ? 0 : availability ? 1 : 2));
     }
 }

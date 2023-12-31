@@ -12,7 +12,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import com.example.myapplication.adapter.ScreeningAdapter;
 import com.example.myapplication.model.Cinema;
 import com.example.myapplication.model.Movie;
 import com.example.myapplication.model.Screening;
@@ -24,12 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import org.checkerframework.checker.units.qual.A;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -82,6 +79,22 @@ public class ScreeningFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_screening, container, false);
+    }
+
+    Movie movie;
+    Cinema cinema;
+    Date date, date2;
+    ArrayList<Screening> screenings;
+
+    TextView tvCinemaPreciseLocation, tvCinemaPhoneNumber;
+    RecyclerView rvScreenings;
+    ScreeningAdapter screeningAdapter;
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         Bundle args = getArguments();
         if(args.getParcelable("movie") != null){
@@ -91,46 +104,25 @@ public class ScreeningFragment extends Fragment {
         date = DateFormatHelper.toDate(args.getString("date"), "MM dd, yyyy");
         date2 = DateFormatHelper.addDate(date, 1);
 
-
-
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_screening, container, false);
-    }
-
-    Movie movie;
-    Cinema cinema;
-    Date date, date2;
-    ArrayList<Screening> screenings;
-    RecyclerView rvScreenings;
-    ScreeningAdapter screeningAdapter;
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        tvCinemaPreciseLocation = view.findViewById(R.id.tvCinemaPreciseLocation);
+        tvCinemaPhoneNumber = view.findViewById(R.id.tvCinemaPhoneNumber);
+        tvCinemaPreciseLocation.setText(cinema.getPreciseLocation());
+        tvCinemaPhoneNumber.setText(cinema.getPhoneNumber());
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        DocumentReference movieRef = null;
-        if(movie != null){
-            movieRef = db.collection("movies").document(movie.getId());
-        }
-        DocumentReference cinemaRef = db.collection("cinemas").document(cinema.getId());
 
         screenings = new ArrayList<>();
 
         rvScreenings = view.findViewById(R.id.rvScreenings);
-
-        Log.v("movie", movie.getId());
-
-        screeningAdapter = new ScreeningAdapter(getContext(), screenings, movie, cinema);
+        screeningAdapter = new ScreeningAdapter(getContext(), screenings);
         rvScreenings.setAdapter(screeningAdapter);
         rvScreenings.setLayoutManager(new LinearLayoutManager(getContext()));
 
         if(movie != null){
             db.collection("screenings")
-                    .whereEqualTo("movieId", movieRef)
-                    .whereEqualTo("cinemaId", cinemaRef)
-                    .whereGreaterThan("date", date)
+                    .whereEqualTo("movie", movie.getRef())
+                    .whereEqualTo("cinema", cinema.getRef())
+                    .whereGreaterThanOrEqualTo("date", date)
                     .whereLessThan("date", date2)
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -139,17 +131,8 @@ public class ScreeningFragment extends Fragment {
                             if (task.isSuccessful()) {
                                 for (QueryDocumentSnapshot document : task.getResult()) {
                                     Screening screening = new Screening(document);
-                                    Log.d("screening", screening.getId());
-                                    document.getDocumentReference("movieId")
-                                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                    if(task.isSuccessful()){
-                                                        DocumentSnapshot document = task.getResult();
-                                                        screening.setMovie(new Movie(document));
-                                                    }
-                                                }
-                                            });
+                                    screening.setMovie(movie);
+                                    screening.setCinema(cinema);
 
                                     document.getReference().collection("time")
                                             .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -158,12 +141,13 @@ public class ScreeningFragment extends Fragment {
                                                     if(task.isSuccessful()){
                                                         for(QueryDocumentSnapshot document : task.getResult()){
                                                             screening.addTime(document);
-                                                            screeningAdapter.setScreenings(screenings);
                                                         }
                                                         screenings.add(screening);
+                                                        screeningAdapter.setScreenings(screenings);
                                                     }
                                                 }
                                             });
+
                                 }
                             } else {
 
@@ -172,8 +156,8 @@ public class ScreeningFragment extends Fragment {
                     });
         }else {
             db.collection("screenings")
-                    .whereEqualTo("cinemaId", cinemaRef)
-                    .whereGreaterThan("date", date)
+                    .whereEqualTo("cinema", cinema.getRef())
+                    .whereGreaterThanOrEqualTo("date", date)
                     .whereLessThan("date", date2)
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -182,7 +166,9 @@ public class ScreeningFragment extends Fragment {
                             if (task.isSuccessful()) {
                                 for (QueryDocumentSnapshot document : task.getResult()) {
                                     Screening screening = new Screening(document);
-                                    document.getDocumentReference("movieId")
+                                    screening.setCinema(cinema);
+
+                                    document.getDocumentReference("movie")
                                             .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {

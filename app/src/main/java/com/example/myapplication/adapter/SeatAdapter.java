@@ -1,16 +1,21 @@
-package com.example.myapplication;
+package com.example.myapplication.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.myapplication.ChoosingSeatActivity;
+import com.example.myapplication.R;
 import com.example.myapplication.model.Seat;
 
 import java.util.ArrayList;
@@ -39,27 +44,33 @@ public class SeatAdapter extends RecyclerView.Adapter<SeatAdapter.SeatViewHolder
         return new SeatViewHolder(view);
     }
 
+    @SuppressLint("ResourceAsColor")
     @Override
     public void onBindViewHolder(@NonNull SeatViewHolder holder, int position) {
         holder.tvSeat.setText(seats.get(position).getSeatNumber());
-        if(seats.get(position).getAvailable() == false){
-            holder.tvSeat.setBackgroundColor(Color.parseColor("#FF0000"));
+
+        if(seats.get(position).getSeatNumber().contains("2") || seats.get(position).getSeatNumber().contains("5")){
+
         }
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ArrayList<Seat> selectedSeats = ((BookingActivity)context).getSelectedSeats();
-                if(selectedSeats.contains(seats.get(holder.getAdapterPosition()))){
-                    ((BookingActivity)context).removeSelectedSeats(seats.get(holder.getAdapterPosition()));
-                    holder.tvSeat.setBackgroundColor(Color.parseColor("#FFFFFF"));
-                }else{
-                    ((BookingActivity)context).addSelectedSeats(seats.get(holder.getAdapterPosition()));
-                    holder.tvSeat.setBackgroundColor(Color.parseColor("#FFFF00"));
+        if(seats.get(position).getAvailability() == false){
+            holder.tvSeat.setBackgroundColor(Color.parseColor("#ff4949"));
+        }else{
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @SuppressLint("ResourceAsColor")
+                @Override
+                public void onClick(View v) {
+                    ArrayList<Seat> selectedSeats = ((ChoosingSeatActivity)context).getSelectedSeats();
+                    if(selectedSeats.contains(seats.get(holder.getAdapterPosition()))){
+                        ((ChoosingSeatActivity)context).removeSelectedSeats(seats.get(holder.getAdapterPosition()));
+                        holder.tvSeat.setBackgroundColor(Color.parseColor("#848484"));
+                    }else{
+                        ((ChoosingSeatActivity)context).addSelectedSeats(seats.get(holder.getAdapterPosition()));
+                        holder.tvSeat.setBackgroundColor(Color.parseColor("#148DFF"));
+                    }
                 }
-            }
-        });
-
+            });
+        }
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.example.myapplication;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -10,33 +9,35 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
-import com.example.myapplication.model.Cinema;
-import com.example.myapplication.model.Movie;
+import com.example.myapplication.adapter.SeatAdapter;
+import com.example.myapplication.model.Screening;
 import com.example.myapplication.model.ScreeningTime;
 import com.example.myapplication.model.Seat;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
-public class BookingActivity extends AppCompatActivity implements View.OnClickListener {
+public class ChoosingSeatActivity extends TemplateActivity implements View.OnClickListener {
 
     ScreeningTime screeningTime;
 
+    Screening screening;
+
     RecyclerView rvSeats;
+
+    ArrayList<Seat> seats;
 
     ArrayList<Seat> selectedSeats;
 
+    TextView tvCinemaLocation, tvCinemaStudio;
+
     Button btnOrder;
-
-    Movie movie;
-
-    Cinema cinema;
 
     public ArrayList<Seat> getSelectedSeats() {
         return selectedSeats;
@@ -57,27 +58,32 @@ public class BookingActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_booking);
+        setContentView(R.layout.activity_choosing_seat);
 
+        setupToolbar("Choosing seat");
+        setupBackBtn();
+
+        screeningTime = getIntent().getExtras().getParcelable("screeningTime");
+        screening = getIntent().getExtras().getParcelable("screening");
+//        movie = getIntent().getExtras().getParcelable("movie");
+//        cinema = getIntent().getExtras().getParcelable("cinema");
+
+        tvCinemaLocation = findViewById(R.id.tvCinemaLocation);
+        tvCinemaStudio = findViewById(R.id.tvCinemaStudio);
+        tvCinemaLocation.setText(screening.getCinema().getLocation());
+        tvCinemaStudio.setText("Studio " + String.valueOf(screening.getStudio()));
+
+        seats = new ArrayList<Seat>();
         selectedSeats = new ArrayList<>();
 
         btnOrder = findViewById(R.id.btnOrder);
-
         btnOrder.setOnClickListener(this);
-
-        screeningTime = getIntent().getExtras().getParcelable("screeningTime");
-        Log.v("hello", DateFormatHelper.toString(screeningTime.getTime(), "dd-MM-yyyy"));
-        movie = getIntent().getExtras().getParcelable("movie");
-        cinema = getIntent().getExtras().getParcelable("cinema");
-
-        ArrayList<Seat> seats = new ArrayList<Seat>();
 
         rvSeats = findViewById(R.id.rvSeats);
         SeatAdapter seatAdapter = new SeatAdapter(this, seats);
         rvSeats.setAdapter(seatAdapter);
-        rvSeats.setLayoutManager(new GridLayoutManager(this, 10));
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        rvSeats.setLayoutManager(new GridLayoutManager(this, 7));
+        rvSeats.addItemDecoration(new GridSpaceItemDecoration(7, 30, false));
 
         DocumentReference docRef = db.document(screeningTime.getRef());
 
@@ -113,8 +119,7 @@ public class BookingActivity extends AppCompatActivity implements View.OnClickLi
             Intent toOrder = new Intent(this, OrderActivity.class);
             toOrder.putExtra("selectedSeats", selectedSeats);
             toOrder.putExtra("screeningTime", screeningTime);
-            toOrder.putExtra("movie", movie);
-            toOrder.putExtra("cinema", cinema);
+            toOrder.putExtra("screening", screening);
             startActivity(toOrder);
         }
     }

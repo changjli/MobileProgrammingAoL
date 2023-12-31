@@ -16,10 +16,16 @@
         android:theme="@style/Theme.MyApplication"
         tools:targetApi="31">
         <activity
+            android:name=".SuccessActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TransactionActivity"
+            android:exported="false" />
+        <activity
             android:name=".OrderActivity"
             android:exported="false" />
         <activity
-            android:name=".BookingActivity"
+            android:name=".ChoosingSeatActivity"
             android:exported="false" />
         <activity
             android:name=".ScreeningActivity"
@@ -31,7 +37,7 @@
             android:name=".MovieActivity"
             android:exported="false" />
         <activity
-            android:name=".Profile"
+            android:name=".ProfileActivity"
             android:exported="false" />
         <activity
             android:name=".forgotpassword.Email"

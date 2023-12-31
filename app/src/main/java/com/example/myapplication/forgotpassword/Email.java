@@ -2,6 +2,7 @@ package com.example.myapplication.forgotpassword;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -19,9 +20,11 @@ public class Email extends AppCompatActivity implements View.OnClickListener {
 
     private FirebaseAuth mauth;
 
+    CardView cvForgotPassword;
+
     EditText etEmail;
 
-    Button btnSendEmail;
+    Button btnSendEmail, btnCancel;
 
     String email;
 
@@ -34,8 +37,13 @@ public class Email extends AppCompatActivity implements View.OnClickListener {
 
         etEmail = findViewById(R.id.etEmail);
         btnSendEmail = findViewById(R.id.btnSendEmail);
+        btnCancel = findViewById(R.id.btnCancel);
+
+        cvForgotPassword = findViewById(R.id.cvForgotPassword);
+        cvForgotPassword.getBackground().setAlpha(230);
 
         btnSendEmail.setOnClickListener(this);
+        btnCancel.setOnClickListener(this);
     }
 
     @Override
@@ -54,6 +62,8 @@ public class Email extends AppCompatActivity implements View.OnClickListener {
                             }
                         }
                     });
+        }else if(v.getId() == R.id.btnCancel){
+            finish();
         }
     }
 }

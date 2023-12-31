@@ -27,4 +27,8 @@ public class DateFormatHelper {
         c.add(Calendar.DATE, n);
         return c.getTime();
     }
+
+    public static Date getCurrentDateTime(){
+        return Calendar.getInstance().getTime();
+    }
 }

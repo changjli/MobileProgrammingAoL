@@ -1,12 +1,9 @@
 package com.example.myapplication;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,22 +12,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.example.myapplication.adapter.MovieAdapter;
 import com.example.myapplication.model.Movie;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.smarteist.autoimageslider.SliderView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -89,14 +82,13 @@ public class HomeFragment extends Fragment {
     }
 
     // dari sini kebawah seharusnya mirip kaya activity
-    FirebaseAuth mauth;
-
-    int[] carouselItems = {R.drawable.b90cb5d0d303e7ac4ff60e482a5f913b};
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // carousel
         List<String> carouselItems = new ArrayList<>();
         carouselItems.add("_61798ddc3a43c56b8617e176e88198f");
         carouselItems.add("_df1593f4690c96aa7c28cb08ea10e6c");
@@ -104,25 +96,19 @@ public class HomeFragment extends Fragment {
 
         SliderView carousel = getActivity().findViewById(R.id.carouselSlider);
         carousel.setSliderAdapter(new CarouselAdapter(getContext(), carouselItems));
+        // end
 
-        Date temp;
-
-        try {
-            temp = new SimpleDateFormat("dd/MM/yyyy").parse("20/10/2003");
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-
+        // rv movies
         ArrayList<Movie> movies = new ArrayList<>();
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        MovieAdapter movieAdatper = new MovieAdapter(getContext(), movies);
-
         RecyclerView rvMovies = getActivity().findViewById(R.id.rvMovies);
+        MovieAdapter movieAdatper = new MovieAdapter(getContext(), movies);
         rvMovies.setAdapter(movieAdatper);
         rvMovies.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        rvMovies.addItemDecoration(new GridSpaceItemDecoration(2, 30, false));
+        // end
 
+        // fetch movies
         db.collection("movies")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -130,17 +116,16 @@ public class HomeFragment extends Fragment {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                movies.add(new Movie(document));
+                                if(document.exists()){
+                                    movies.add(new Movie(document));
+                                }
                             }
                             movieAdatper.setMovies(movies);
-                            Log.d("hello", Integer.toString(movies.size()));
                         } else {
-
+                            Toast.makeText(getContext(), "Failed to fetch data", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
-
-
 
 //        movies.add(new Movie("1", "2", 120, temp, temp, "4", "5", "6", "7", "8", "9", "10", "11", 4.0));
 //        movies.add(new Movie("1", "2", 120, temp, temp, "4", "5", "6", "7", "8", "9", "10", "11", 4.0));

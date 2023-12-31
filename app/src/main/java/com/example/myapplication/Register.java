@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,6 +21,8 @@ import com.google.firebase.auth.FirebaseAuth;
 public class Register extends AppCompatActivity implements View.OnClickListener {
 
     private FirebaseAuth mAuth;
+
+    CardView cvRegisterContainer;
 
     EditText etEmail, etPassword;
 
@@ -41,6 +44,9 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         btnRegister = findViewById(R.id.btnRegister);
         tvToLogin = findViewById(R.id.tvToLogin);
 
+        cvRegisterContainer = findViewById(R.id.cvRegisterContainer);
+        cvRegisterContainer.getBackground().setAlpha(230);
+
         btnRegister.setOnClickListener(this);
         tvToLogin.setOnClickListener(this);
     }
@@ -59,6 +65,11 @@ public class Register extends AppCompatActivity implements View.OnClickListener 
         if(v.getId() == R.id.btnRegister){
             email = etEmail.getText().toString();
             password = etPassword.getText().toString();
+
+            if(email.isEmpty() || password.isEmpty()){
+                Toast.makeText(this, "all fields are required", Toast.LENGTH_LONG).show();
+                return;
+            }
 
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {

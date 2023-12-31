@@ -5,7 +5,10 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import com.example.myapplication.DateFormatHelper;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -23,11 +26,13 @@ public class Movie implements Parcelable {
     private String producer;
     private String director;
     private String writer;
-    private ArrayList<String> casts;
+    private String casts;
     private String distributor;
     private double rating;
+    private int rated;
+    private String genre;
 
-    public Movie(String id, String title, int duration, Date startDate, Date endDate, String trailerUrl, String imageUrl, String description, String producer, String director, String writer, ArrayList<String> casts, String distributor, double rating) {
+    public Movie(String id, String title, int duration, Date startDate, Date endDate, String trailerUrl, String imageUrl, String description, String producer, String director, String writer, String casts, String distributor, double rating, int rated, String genre) {
         this.id = id;
         this.title = title;
         this.duration = duration;
@@ -42,32 +47,15 @@ public class Movie implements Parcelable {
         this.casts = casts;
         this.distributor = distributor;
         this.rating = rating;
-    }
-
-    public Movie(){
-
-    }
-
-    public Movie(QueryDocumentSnapshot document){
-        this.id = document.getId();
-        this.title = document.getString("title");
-        this.duration = 0;
-        this.startDate = document.getDate("startDate");
-        this.endDate = document.getDate("endDate");
-        this.imageUrl = document.getString("imageUrl");
-        this.description = document.getString("description");
-        this.producer = document.getString("producer");
-        this.director = document.getString("director");
-        this.writer = document.getString("writer");
-        this.casts = null;
-        this.distributor = document.getString("distributor");
-        this.rating = 4.5;
+        this.rated = rated;
+        this.genre = genre;
     }
 
     public Movie(DocumentSnapshot document){
         this.id = document.getId();
         this.title = document.getString("title");
-        this.duration = 0;
+        this.duration = document.getLong("duration").intValue();
+//        this.duration = 100;
         this.startDate = document.getDate("startDate");
         this.endDate = document.getDate("endDate");
         this.imageUrl = document.getString("imageUrl");
@@ -75,9 +63,12 @@ public class Movie implements Parcelable {
         this.producer = document.getString("producer");
         this.director = document.getString("director");
         this.writer = document.getString("writer");
-        this.casts = null;
+        this.casts = document.getString("casts");
         this.distributor = document.getString("distributor");
         this.rating = 4.5;
+//        this.rated = document.getLong("rated").intValue();
+        this.rated = document.getLong("rated").intValue();
+        this.genre = document.getString("genre");
     }
 
     protected Movie(Parcel in) {
@@ -90,9 +81,11 @@ public class Movie implements Parcelable {
         producer = in.readString();
         director = in.readString();
         writer = in.readString();
-        casts = in.createStringArrayList();
+        casts = in.readString();
         distributor = in.readString();
         rating = in.readDouble();
+        rated = in.readInt();
+        genre = in.readString();
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {
@@ -195,11 +188,11 @@ public class Movie implements Parcelable {
         this.writer = writer;
     }
 
-    public ArrayList<String> getCasts() {
+    public String getCasts() {
         return casts;
     }
 
-    public void setCasts(ArrayList<String> casts) {
+    public void setCasts(String casts) {
         this.casts = casts;
     }
 
@@ -217,6 +210,27 @@ public class Movie implements Parcelable {
 
     public void setRating(double rating) {
         this.rating = rating;
+    }
+
+    public int getRated() {
+        return rated;
+    }
+
+    public void setRated(int rated) {
+        this.rated = rated;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public DocumentReference getRef(){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        return db.collection("movies").document(this.id);
     }
 
     /**
@@ -252,8 +266,10 @@ public class Movie implements Parcelable {
         dest.writeString(producer);
         dest.writeString(director);
         dest.writeString(writer);
-        dest.writeStringList(casts);
+        dest.writeString(casts);
         dest.writeString(distributor);
         dest.writeDouble(rating);
+        dest.writeInt(rated);
+        dest.writeString(genre);
     }
 }

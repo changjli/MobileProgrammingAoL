@@ -1,18 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/toHome"
+        android:id="@+id/menuItemHome"
         android:enabled="true"
         android:title="Home"
+        android:icon="@drawable/baseline_home_24"
         />
     <item
-        android:id="@+id/toCinema"
+        android:id="@+id/menuItemCinema"
         android:enabled="true"
         android:title="Cinema"
+        android:icon="@drawable/baseline_theaters_24"
         />
+
+<!--    <item-->
+<!--        android:id="@+id/menuItemFood"-->
+<!--        android:enabled="true"-->
+<!--        android:title="Food"-->
+<!--        android:icon="@drawable/baseline_fastfood_24"-->
+<!--        />-->
+
+
     <item
-        android:id="@+id/toTicket"
+        android:id="@+id/menuItemTicket"
         android:enabled="true"
         android:title="Ticket"
+        android:icon="@drawable/baseline_history_24"
         />
 </menu>

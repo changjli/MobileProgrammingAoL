@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,8 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.myapplication.adapter.CinemaAdapter;
 import com.example.myapplication.model.Cinema;
-import com.example.myapplication.model.Movie;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -29,7 +30,7 @@ import java.util.ArrayList;
  * Use the {@link CinemaFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CinemaFragment extends Fragment {
+public class CinemaFragment extends Fragment implements SearchView.OnQueryTextListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -64,7 +65,11 @@ public class CinemaFragment extends Fragment {
 
     ArrayList<Cinema> cinemas;
 
+    CinemaAdapter cinemaAdapter;
+
     Toolbar myToolbar;
+
+    SearchView svCinema;
 
     RecyclerView rvCinemas;
 
@@ -92,7 +97,11 @@ public class CinemaFragment extends Fragment {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        CinemaAdapter cinemaAdapter = new CinemaAdapter(getContext(), cinemas);
+        cinemaAdapter = new CinemaAdapter(getContext(), cinemas);
+
+        svCinema = view.findViewById(R.id.svCinema);
+        svCinema.setQueryHint("Search for cinema");
+        svCinema.setOnQueryTextListener(this);
 
         rvCinemas = view.findViewById(R.id.rvCinemas);
         rvCinemas.setAdapter(cinemaAdapter);
@@ -113,5 +122,41 @@ public class CinemaFragment extends Fragment {
                         }
                     }
                 });
+    }
+
+    /**
+     * Called when the user submits the query. This could be due to a key press on the
+     * keyboard or due to pressing a submit button.
+     * The listener can override the standard behavior by returning true
+     * to indicate that it has handled the submit request. Otherwise return false to
+     * let the SearchView handle the submission by launching any associated intent.
+     *
+     * @param query the query text that is to be submitted
+     * @return true if the query has been handled by the listener, false to let the
+     * SearchView perform the default action.
+     */
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    /**
+     * Called when the query text is changed by the user.
+     *
+     * @param newText the new content of the query text field.
+     * @return false if the SearchView should perform the default action of showing any
+     * suggestions if available, true if the action was handled by the listener.
+     */
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        ArrayList<Cinema> temp = new ArrayList<>();
+        for(Cinema cinema : cinemas){
+            if(cinema.getLocation().toLowerCase().contains(newText.toLowerCase())){
+                temp.add(cinema);
+                Log.v("hello", "world");
+                cinemaAdapter.setCinemas(temp);
+            }
+        }
+        return false;
     }
 }

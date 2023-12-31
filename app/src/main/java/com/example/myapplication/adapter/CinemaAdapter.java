@@ -1,21 +1,20 @@
-package com.example.myapplication;
+package com.example.myapplication.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.myapplication.R;
+import com.example.myapplication.ScreeningActivity;
 import com.example.myapplication.model.Cinema;
 import com.example.myapplication.model.Movie;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaViewHolder> {
@@ -24,12 +23,14 @@ public class CinemaAdapter extends RecyclerView.Adapter<CinemaAdapter.CinemaView
     ArrayList<Cinema> cinemas;
     Movie movie;
 
+    // kalo flownya cinema > movie > booking
     public CinemaAdapter(Context context, ArrayList<Cinema> cinemas){
         this.context = context;
         this.cinemas = cinemas;
         this.movie = null;
     }
 
+    // kalo flownya movie > cinema > booking
     public CinemaAdapter(Context context, ArrayList<Cinema> cinemas, Movie movie){
         this.context = context;
         this.cinemas = cinemas;

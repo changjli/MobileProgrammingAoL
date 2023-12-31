@@ -1,61 +1,54 @@
-package com.example.myapplication;
+package com.example.myapplication.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.myapplication.model.Cinema;
-import com.example.myapplication.model.Movie;
+import com.example.myapplication.ChoosingSeatActivity;
+import com.example.myapplication.DateFormatHelper;
+import com.example.myapplication.R;
+import com.example.myapplication.model.Screening;
 import com.example.myapplication.model.ScreeningTime;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
-public class TimeAdapter extends RecyclerView.Adapter<TimeAdapter.TimeViewHolder> {
+public class ScreeningTimeAdapter extends RecyclerView.Adapter<ScreeningTimeAdapter.TimeViewHolder> {
     Context context;
-    ArrayList<ScreeningTime> time;
+    Screening screening;
+    ArrayList<ScreeningTime> screeningTimes;
 
-    Movie movie;
-
-    Cinema cinema;
-
-    public TimeAdapter(Context context, ArrayList<ScreeningTime> time, Movie movie, Cinema cinema){
+    public ScreeningTimeAdapter(Context context, Screening screening){
         this.context = context;
-        this.time = time;
-        this.movie = movie;
-        this.cinema = cinema;
+        this.screening = screening;
+        this.screeningTimes = screening.getTime();
     }
 
     @NonNull
     @Override
     public TimeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.row_time, parent, false);
+                .inflate(R.layout.row_screening_time, parent, false);
 
         return new TimeViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TimeViewHolder holder, int position) {
-        holder.tvTime.setText(DateFormatHelper.toString(time.get(position).getTime(), "dd-MM-YYYY"));
+        holder.tvTime.setText(DateFormatHelper.toString(screeningTimes.get(position).getTime(), "HH:mm"));
         holder.tvTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent toBook = new Intent(v.getContext(), BookingActivity.class);
-                toBook.putExtra("screeningTime", time.get(holder.getAdapterPosition()));
-                Log.v("time", DateFormatHelper.toString(time.get(holder.getAdapterPosition()).getTime(), "dd-MM-YYYY"));
-                toBook.putExtra("cape", "hello");
-                toBook.putExtra("movie", movie);
-                toBook.putExtra("cinema", cinema);
+                Intent toBook = new Intent(v.getContext(), ChoosingSeatActivity.class);
+                toBook.putExtra("screeningTime", screeningTimes.get(holder.getAdapterPosition()));
+                toBook.putExtra("screening", screening);
+//                toBook.putExtra("movie", movie);
+//                toBook.putExtra("cinema", cinema);
                 v.getContext().startActivity(toBook);
             }
         });
@@ -64,7 +57,7 @@ public class TimeAdapter extends RecyclerView.Adapter<TimeAdapter.TimeViewHolder
 
     @Override
     public int getItemCount() {
-        return time.size();
+        return screeningTimes.size();
     }
 
     public static class TimeViewHolder extends RecyclerView.ViewHolder {

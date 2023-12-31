@@ -1,47 +1,50 @@
 package com.example.myapplication;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.myapplication.model.Cinema;
-import com.example.myapplication.model.Movie;
+import com.bumptech.glide.Glide;
+import com.example.myapplication.adapter.SeatAdapter;
+import com.example.myapplication.model.Promo;
+import com.example.myapplication.model.Screening;
 import com.example.myapplication.model.ScreeningTime;
 import com.example.myapplication.model.Seat;
 import com.example.myapplication.model.TransactionHeader;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.Firebase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
-public class OrderActivity extends AppCompatActivity implements View.OnClickListener {
-
-    Movie movie;
-    Cinema cinema;
+public class OrderActivity extends TemplateActivity implements View.OnClickListener {
+    Screening screening;
     ScreeningTime screeningTime;
     ArrayList<Seat> selectedSeats;
-    FirebaseFirestore db;
-    TextView tvMovie, tvCinema, tvScreeningTime;
+    TextView tvMovieTitle, tvCinemaLocation, tvScreeningDate, tvScreeningTime, tvScreeningStudio, tvTicketPrice, tvTicketTotalPrice,
+    tvPromo, tvTotalPrice;
+    ImageView ivMovieImageUrl, btnCheckPromo;
     RecyclerView rvSelectedSeats;
+    EditText etPromo;
+    Spinner paymentSpinner;
     Button btnTransaction;
-    FirebaseAuth mauth;
     FirebaseUser muser;
 
     @Override
@@ -49,23 +52,51 @@ public class OrderActivity extends AppCompatActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
 
-        movie = getIntent().getExtras().getParcelable("movie");
-        cinema = getIntent().getExtras().getParcelable("cinema");
+        setupToolbar("Order");
+        setupBackBtn();
+
+        screening = getIntent().getExtras().getParcelable("screening");
         screeningTime = getIntent().getExtras().getParcelable("screeningTime");
         selectedSeats = getIntent().getExtras().getParcelableArrayList("selectedSeats");
 
-        tvMovie = findViewById(R.id.tvMovie);
-        tvCinema = findViewById(R.id.tvCinema);
+        ivMovieImageUrl = findViewById(R.id.ivMovieImageUrl);
+        tvMovieTitle = findViewById(R.id.tvMovieTitle);
+        tvCinemaLocation = findViewById(R.id.tvCinemaLocation);
+        tvScreeningDate = findViewById(R.id.tvScreeningDate);
         tvScreeningTime = findViewById(R.id.tvScreeningTime);
+        tvScreeningStudio = findViewById(R.id.tvScreeningStudio);
+        tvTicketPrice = findViewById(R.id.tvTicketPrice);
+        tvTicketTotalPrice = findViewById(R.id.tvTicketTotalPrice);
+        tvPromo = findViewById(R.id.tvPromo);
+        tvTotalPrice = findViewById(R.id.tvTotalPrice);
 
-        tvMovie.setText(movie.getTitle());
-        tvCinema.setText(cinema.getLocation());
-        SimpleDateFormat formatter = new SimpleDateFormat("MM dd, yyyy");
-        tvScreeningTime.setText(formatter.format(screeningTime.getTime()));
+        Glide
+                .with(this)
+                .load(screening.getMovie().getImageUrl())
+                .centerCrop()
+                .into(ivMovieImageUrl);
+        tvMovieTitle.setText(screening.getMovie().getTitle());
+        tvCinemaLocation.setText("Location : " + screening.getCinema().getLocation());
+        tvScreeningDate.setText("Date : " + DateFormatHelper.toString(screeningTime.getTime(), "MM dd, yyyy"));
+        tvScreeningStudio.setText("Studio" + String.valueOf(screening.getStudio()));
+        tvScreeningTime.setText("Time : " + DateFormatHelper.toString(screeningTime.getTime(), "HH:mm"));
+        tvTicketPrice.setText(String.format("%d x %d", screening.getPrice(), selectedSeats.size()));
+        tvTicketTotalPrice.setText(String.format("%d", screening.getPrice() * selectedSeats.size()));
+        tvPromo.setText("0%");
+        tvTotalPrice.setText(String.format("%d", screening.getPrice() * selectedSeats.size()));
+
+        etPromo = findViewById(R.id.etPromo);
+        btnCheckPromo= findViewById(R.id.btnCheckPromo);
+        btnCheckPromo.setOnClickListener(this);
+
+        paymentSpinner = findViewById(R.id.paymentSpinner);
+        String[] payments = new String[]{"mbanking", "gopay", "shopeepay"};
+        ArrayAdapter<String> paymentAdapter = new ArrayAdapter<>(this, R.layout.row_payment, payments);
+        paymentSpinner.setAdapter(paymentAdapter);
 
         rvSelectedSeats = findViewById(R.id.rvSelectedSeats);
         rvSelectedSeats.setAdapter(new SeatAdapter(this, selectedSeats));
-        rvSelectedSeats.setLayoutManager(new LinearLayoutManager(this));
+        rvSelectedSeats.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         btnTransaction = findViewById(R.id.btnTransaction);
 
@@ -77,6 +108,8 @@ public class OrderActivity extends AppCompatActivity implements View.OnClickList
         db = FirebaseFirestore.getInstance();
     }
 
+    // transaction headers > transaction details > update seat
+
     /**
      * Called when a view has been clicked.
      *
@@ -86,22 +119,67 @@ public class OrderActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         if(v.getId() == R.id.btnTransaction){
             db.collection("transactionHeaders")
-                    .add(new TransactionHeader(muser.getUid(), db.document(screeningTime.getRef()), Calendar.getInstance().getTime(), 50, "ovo"))
+                    .add(new TransactionHeader(muser.getUid(), Calendar.getInstance().getTime(), Integer.parseInt(tvTotalPrice.getText().toString()), paymentSpinner.getSelectedItem().toString(), screeningTime.getTime(), selectedSeats.size(), screening.getStudio()))
                     .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                         @Override
                         public void onComplete(@NonNull Task<DocumentReference> task) {
                             if(task.isSuccessful()){
                                 DocumentReference ref = task.getResult();
+
+                                // movie
+                                ref.collection("movie")
+                                        .add(screening.getMovie()).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentReference> task) {
+
+                                            }
+                                        });
+
+                                // cinema
+                                ref.collection("cinema")
+                                        .add(screening.getCinema()).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentReference> task) {
+
+                                            }
+                                        });
+
+                                // transaction details
                                 for(Seat seat : selectedSeats){
-                                    ref.collection("transactionDetails")
+                                    ref.collection("seats")
                                             .add(seat).addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<DocumentReference> task) {
+                                                    // biar gabisa dibook lagi
                                                     db.document(seat.getRef()).update("availability", false);
+
+                                                    Intent toSuccess = new Intent(v.getContext(), SuccessActivity.class);
+                                                    // remove all activity
+                                                    toSuccess.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                    startActivity(toSuccess);
+
                                                 }
                                             });
                                 }
-                                Toast.makeText(OrderActivity.this, "transaction successful", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+        }else if(v.getId() == R.id.btnCheckPromo){
+            db.collection("promos").whereEqualTo("code", etPromo.getText().toString()).get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            Promo promo = null;
+                            if(task.isSuccessful()){
+                                for(QueryDocumentSnapshot document : task.getResult()){
+                                    promo = new Promo(document);
+                                }
+                                if(promo == null){
+                                    Toast.makeText(OrderActivity.this, "Promo code doesn't exist", Toast.LENGTH_LONG).show();
+                                }else{
+                                    tvPromo.setText(String.valueOf(promo.getDiscount()) + "%");
+                                    tvTotalPrice.setText(String.format("%d", (screening.getPrice() * selectedSeats.size() - (screening.getPrice() * promo.getDiscount() / 100))));
+                                }
                             }
                         }
                     });

@@ -63,6 +63,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-storage")
 
     implementation("com.google.android.material:material:1.10.0")
 
@@ -71,4 +72,6 @@ dependencies {
     implementation ("com.github.smarteist:autoimageslider:1.4.0")
 
     implementation ("com.github.bumptech.glide:glide:4.15.0")
+
+    implementation ("com.nex3z:flow-layout:1.3.3")
 }

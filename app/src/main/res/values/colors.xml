@@ -5,4 +5,9 @@
     <color name="primary">#374344</color>
     <color name="secondary">#DCA721</color>
     <color name="gray">#D9D9D9</color>
+    <color name="dark_gray">#848484</color>
+    <color name="success">#12B772</color>
+    <color name="info">#148DFF</color>
+    <color name="warning">#E88402</color>
+    <color name="danger">#ff4949</color>
 </resources>

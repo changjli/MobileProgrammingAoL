@@ -6,17 +6,21 @@ import java.util.Date;
 
 public class TransactionHeader {
     private String uid;
-    private DocumentReference screening;
     private Date date;
     private double price;
     private String payment;
+    private Date screeningDateTime;
+    private int seatQty;
+    private int studio;
 
-    public TransactionHeader(String uid, DocumentReference screening, Date date, double price, String payment) {
+    public TransactionHeader(String uid, Date date, double price, String payment, Date screeningDateTime, int seatQty, int studio) {
         this.uid = uid;
-        this.screening = screening;
         this.date = date;
         this.price = price;
         this.payment = payment;
+        this.screeningDateTime = screeningDateTime;
+        this.seatQty = seatQty;
+        this.studio = studio;
     }
 
     public String getUid() {
@@ -25,14 +29,6 @@ public class TransactionHeader {
 
     public void setUid(String uid) {
         this.uid = uid;
-    }
-
-    public DocumentReference getScreening() {
-        return screening;
-    }
-
-    public void setScreening(DocumentReference screening) {
-        this.screening = screening;
     }
 
     public Date getDate() {
@@ -57,5 +53,29 @@ public class TransactionHeader {
 
     public void setPayment(String payment) {
         this.payment = payment;
+    }
+
+    public Date getScreeningDateTime() {
+        return screeningDateTime;
+    }
+
+    public void setScreeningDateTime(Date screeningDateTime) {
+        this.screeningDateTime = screeningDateTime;
+    }
+
+    public int getSeatQty() {
+        return seatQty;
+    }
+
+    public void setSeatQty(int seatQty) {
+        this.seatQty = seatQty;
+    }
+
+    public int getStudio() {
+        return studio;
+    }
+
+    public void setStudio(int studio) {
+        this.studio = studio;
     }
 }

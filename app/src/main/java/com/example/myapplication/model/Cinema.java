@@ -5,11 +5,17 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 public class Cinema implements Parcelable {
     private String id;
     private String location;
+
+    private String phoneNumber;
+
+    private String preciseLocation;
 
     public Cinema(String id, String location) {
         this.id = id;
@@ -19,11 +25,15 @@ public class Cinema implements Parcelable {
     public Cinema(QueryDocumentSnapshot document){
         this.id = document.getId();
         this.location = document.getString("location");
+        this.phoneNumber = document.getString("phoneNumber");
+        this.preciseLocation = document.getString("preciseLocation");
     }
 
     protected Cinema(Parcel in) {
         id = in.readString();
         location = in.readString();
+        phoneNumber = in.readString();
+        preciseLocation = in.readString();
     }
 
     public static final Creator<Cinema> CREATOR = new Creator<Cinema>() {
@@ -54,6 +64,27 @@ public class Cinema implements Parcelable {
         this.location = location;
     }
 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getPreciseLocation() {
+        return preciseLocation;
+    }
+
+    public void setPreciseLocation(String preciseLocation) {
+        this.preciseLocation = preciseLocation;
+    }
+
+    public DocumentReference getRef(){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        return db.collection("cinemas").document(this.id);
+    }
+
     /**
      * Describe the kinds of special objects contained in this Parcelable
      * instance's marshaled representation. For example, if the object will
@@ -80,5 +111,7 @@ public class Cinema implements Parcelable {
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(id);
         dest.writeString(location);
+        dest.writeString(phoneNumber);
+        dest.writeString(preciseLocation);
     }
 }
