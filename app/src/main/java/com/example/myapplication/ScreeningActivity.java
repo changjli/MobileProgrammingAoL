@@ -78,7 +78,7 @@ public class ScreeningActivity extends TemplateActivity {
 
     public void addScreeningFragment(int n){
 //        Date currentDate = Calendar.getInstance().getTime();
-        Date currentDate = DateFormatHelper.toDate("12 17, 2023", "MM dd, yyyy");
+        Date currentDate = DateFormatHelper.toDate("1 8, 2024", "MM dd, yyyy");
 
         for(int i=0; i<n; i++){
             String date = DateFormatHelper.toString(currentDate, "MM dd, yyyy");
